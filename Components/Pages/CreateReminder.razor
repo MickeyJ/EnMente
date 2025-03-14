@@ -1,0 +1,90 @@
+﻿@page "/create-reminder"
+@using EnMente.Models
+@using EnMente.Services
+@inject ReminderService _dbService
+
+<h1>Create Reminder</h1>
+
+<section class="">
+
+	<div class="form-group mb-2">
+		<InputText @bind-Value="reminder.Title" placeholder="Title" class="form-control" />
+	</div>
+
+	<div class="form-group mb-2">
+		<InputTextArea @bind-Value="reminder.Description" placeholder="Description" class="form-control" />
+	</div>
+
+	<div class="form-group mb-2">
+		<InputDate @bind-Value="reminder.DateTime"></InputDate>
+	</div>
+
+	<div class="form-group mb-2">
+		<button class="btn btn-primary" @onclick="SaveReminder">Save Reminder</button>
+	</div>
+
+</section>
+
+
+@foreach (ReminderModel reminder in reminders)
+{
+	<section>
+		<p>@reminder.DateTime.ToShortDateString()</p>
+		<p>@reminder.Title</p>
+		<p>@reminder.Description</p>
+		<button class="btn btn-primary" @onclick="@(() => DeleteReminder(reminder))">Delete</button>
+	</section>
+}
+
+@code {
+
+	ReminderModel reminder = new ReminderModel();
+	private List<ReminderModel> reminders = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		await GetReminders();
+	}
+
+	private async Task SaveReminder()
+	{
+		if (Validation())
+		{
+			await _dbService.SaveReminder(reminder);
+			reminder = new ReminderModel();
+			await GetReminders();
+			StateHasChanged();
+			
+		}
+	}
+
+	private async Task GetReminders()
+	{
+		reminders = await _dbService.GetAllReminders();
+	}
+
+	private async Task DeleteReminder(ReminderModel reminder)
+	{
+		await _dbService.DeleteReminder(reminder);
+		await GetReminders();
+		StateHasChanged();
+	}
+
+	private bool Validation()
+	{
+		if (string.IsNullOrWhiteSpace(reminder.Title))
+		{
+			App.Current.MainPage.DisplayAlert("Validation",
+				"Enter Title", "OK");
+			return false;
+		}
+		else if (string.IsNullOrWhiteSpace(reminder.Description))
+		{
+			App.Current.MainPage.DisplayAlert("Validation",
+				"Enter Description", "OK");
+			return false;
+		}
+		return true;
+	}
+	
+}
