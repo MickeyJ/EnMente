@@ -1,4 +1,5 @@
-﻿using UserNotifications;
+﻿using EnMente.Services;
+using UserNotifications;
 
 namespace EnMente.Platforms.iOS
 {

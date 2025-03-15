@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -54,7 +55,8 @@ namespace EnMente.Platforms.Android
                     ? PendingIntentFlags.CancelCurrent | PendingIntentFlags.Immutable
                     : PendingIntentFlags.CancelCurrent;
 
-                PendingIntent pendingIntent = PendingIntent.GetBroadcast(Platform.AppContext, pendingIntentId++, intent, pendingIntentFlags);
+                PendingIntent pendingIntent = PendingIntent.GetBroadcast(Platform.AppContext, pendingIntentId++, intent,
+                    pendingIntentFlags);
                 long triggerTime = GetNotifyTime(notifyTime.Value);
                 AlarmManager alarmManager = Platform.AppContext.GetSystemService(Context.AlarmService) as AlarmManager;
                 alarmManager.Set(AlarmType.RtcWakeup, triggerTime, pendingIntent);
@@ -86,13 +88,14 @@ namespace EnMente.Platforms.Android
                 ? PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable
                 : PendingIntentFlags.UpdateCurrent;
 
-            PendingIntent pendingIntent = PendingIntent.GetActivity(Platform.AppContext, pendingIntentId++, intent, pendingIntentFlags);
+            PendingIntent pendingIntent =
+                PendingIntent.GetActivity(Platform.AppContext, pendingIntentId++, intent, pendingIntentFlags);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(Platform.AppContext, channelId)
                 .SetContentIntent(pendingIntent)
                 .SetContentTitle(title)
-                .SetContentText(message)
-                .SetLargeIcon(BitmapFactory.DecodeResource(Platform.AppContext.Resources, Resource.Drawable.dotnet_logo))
-                .SetSmallIcon(Resource.Drawable.message_small);
+                .SetContentText(message);
+            // .SetLargeIcon(BitmapFactory.DecodeResource(Platform.AppContext.Resources, Resource.Drawable.dotnet_logo))
+            // .SetSmallIcon(Resource.Drawable.message_small);
 
             Notification notification = builder.Build();
             compatManager.Notify(messageId++, notification);
@@ -109,7 +112,8 @@ namespace EnMente.Platforms.Android
                     Description = channelDescription
                 };
                 // Register the channel
-                NotificationManager manager = (NotificationManager)Platform.AppContext.GetSystemService(Context.NotificationService);
+                NotificationManager manager =
+                    (NotificationManager)Platform.AppContext.GetSystemService(Context.NotificationService);
                 manager.CreateNotificationChannel(channel);
                 channelInitialized = true;
             }
@@ -123,3 +127,4 @@ namespace EnMente.Platforms.Android
             return utcAlarmTime; // milliseconds
         }
     }
+}
